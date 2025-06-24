@@ -54,14 +54,14 @@ import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
 import com.dewipuspitasari0020.linakost.util.ViewModelFactory
 import com.dewipuspitasari0020.linakost.viewModel.AuthStatus
-import com.dewipuspitasari0020.linakost.viewModel.UserViewModel
+import com.dewipuspitasari0020.linakost.viewModel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
-    val viewModel: UserViewModel = viewModel(factory = factory)
+    val viewModel: LoginViewModel = viewModel(factory = factory)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class UserViewModel(private val dao: UserDao, private val userDataStore: UserDataStore): ViewModel() {
+class LoginViewModel(private val dao: UserDao, private val userDataStore: UserDataStore): ViewModel() {
     private val _loginStatus = MutableStateFlow<AuthStatus>(AuthStatus.Idle)
     val loginStatus: StateFlow<AuthStatus> = _loginStatus
 
