@@ -1,14 +1,15 @@
 package com.dewipuspitasari0020.linakost.screen
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Looper
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
@@ -35,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.location.LocationManagerCompat.requestLocationUpdates
 import com.dewipuspitasari0020.linakost.ui.theme.bg
 import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
@@ -47,7 +47,6 @@ fun RegisterScreen() {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var alamat by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var latitude by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
@@ -91,7 +90,7 @@ fun RegisterScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(170.dp)
             ) {
                 IconButton(
                     onClick = {  },
@@ -124,8 +123,6 @@ fun RegisterScreen() {
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             Column(
                 modifier = Modifier
@@ -172,28 +169,6 @@ fun RegisterScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = alamat,
-                    onValueChange = { alamat = it },
-                    label = { Text("Alamat", color = Color.Gray) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    minLines = 2,
-                    maxLines = 5,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color.LightGray,
-                        unfocusedBorderColor = Color.DarkGray,
-                        cursorColor = Color.White,
-                        focusedLabelColor = Color.LightGray,
-                        unfocusedLabelColor = Color.Gray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        containerColor = Color.Transparent
-                    ),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 90.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password", color = Color.Gray) },
@@ -220,12 +195,13 @@ fun RegisterScreen() {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = longitude,
                     onValueChange = { longitude = it },
                     label = { Text("Longitude", color = Color.Gray) },
-                    readOnly = true, // Membuat field tidak bisa diedit manual
+                    readOnly = true,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color.LightGray,
                         unfocusedBorderColor = Color.DarkGray,
@@ -240,12 +216,11 @@ fun RegisterScreen() {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Input Latitude
                 OutlinedTextField(
                     value = latitude,
                     onValueChange = { latitude = it },
                     label = { Text("Latitude", color = Color.Gray) },
-                    readOnly = true, // Membuat field tidak bisa diedit manual
+                    readOnly = true,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color.LightGray,
                         unfocusedBorderColor = Color.DarkGray,
@@ -290,7 +265,7 @@ fun RegisterScreen() {
                 ) {
                     Text(
                         text = "Get Current Location",
-                        color = Color.White,
+                        color = textBlack,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -317,6 +292,32 @@ fun RegisterScreen() {
                 }
             }
         }
+    }
+}
+
+private fun requestLocationUpdates(
+    fusedLocationClient: FusedLocationProviderClient,
+    locationCallback: LocationCallback,
+    context: Context
+) {
+    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+        .build()
+
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    } else {
+        Log.e("Location", "Izin lokasi tidak diberikan saat request update.")
     }
 }
 
