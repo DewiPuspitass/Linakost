@@ -103,7 +103,7 @@ fun RegisterScreen(navController: NavHostController) {
                     .height(170.dp)
             ) {
                 IconButton(
-                    onClick = {  },
+                    onClick = { navController.navigate(Screen.Login.route) },
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 16.dp, start = 16.dp)
