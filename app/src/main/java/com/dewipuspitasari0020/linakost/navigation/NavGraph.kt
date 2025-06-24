@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.dewipuspitasari0020.linakost.screen.LoginScreen
 import com.dewipuspitasari0020.linakost.screen.RegisterScreen
 
 @Composable

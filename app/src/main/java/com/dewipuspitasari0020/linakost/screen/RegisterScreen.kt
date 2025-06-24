@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.dewipuspitasari0020.linakost.navigation.Screen
 import com.dewipuspitasari0020.linakost.ui.theme.bg
 import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
@@ -311,6 +312,7 @@ fun RegisterScreen(navController: NavHostController) {
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                             }
                         )
+                        navController.navigate(Screen.Login.route)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
