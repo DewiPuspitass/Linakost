@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -36,14 +37,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dewipuspitasari0020.linakost.ui.theme.bg
 import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
+import com.dewipuspitasari0020.linakost.util.ViewModelFactory
+import com.dewipuspitasari0020.linakost.viewModel.RegisterViewModel
 import com.google.android.gms.location.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen() {
+    val context = LocalContext.current
+    val factory = ViewModelFactory(context)
+    val viewModel: RegisterViewModel = viewModel(factory = factory)
+
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -51,7 +59,6 @@ fun RegisterScreen() {
     var latitude by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
     val locationCallback = remember {
@@ -273,7 +280,36 @@ fun RegisterScreen() {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = {  },
+                    onClick = {
+                        if (fullName.isBlank() || email.isBlank() ||
+                            password.isBlank() || longitude.isBlank() || latitude.isBlank()) {
+                            Toast.makeText(context, "Semua field harus diisi!", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            Toast.makeText(context, "Format email tidak valid!", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
+                        viewModel.registerUser(
+                            fullName = fullName,
+                            email = email,
+                            passwordPlain = password,
+                            longitude = longitude.toDouble(),
+                            latitude = latitude.toDouble(),
+                            onSuccess = {
+                                Toast.makeText(context, "Registrasi Berhasil! Anda bisa login sekarang.", Toast.LENGTH_LONG).show()
+                                fullName = ""
+                                email = ""
+                                password = ""
+                                longitude = ""
+                                latitude = ""
+                            },
+                            onError = { errorMessage ->
+                                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
