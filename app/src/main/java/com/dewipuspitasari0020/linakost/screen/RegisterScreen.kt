@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.dewipuspitasari0020.linakost.ui.theme.bg
 import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
@@ -47,7 +49,7 @@ import com.google.android.gms.location.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(navController: NavHostController) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val viewModel: RegisterViewModel = viewModel(factory = factory)
@@ -360,5 +362,5 @@ private fun requestLocationUpdates(
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegisterScreen() {
-    RegisterScreen()
+    RegisterScreen(rememberNavController())
 }
