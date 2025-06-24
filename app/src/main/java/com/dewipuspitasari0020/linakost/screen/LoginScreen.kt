@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +28,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,18 +53,21 @@ import com.dewipuspitasari0020.linakost.ui.theme.bg
 import com.dewipuspitasari0020.linakost.ui.theme.bgSecondary
 import com.dewipuspitasari0020.linakost.ui.theme.textBlack
 import com.dewipuspitasari0020.linakost.util.ViewModelFactory
-import com.dewipuspitasari0020.linakost.viewModel.RegisterViewModel
+import com.dewipuspitasari0020.linakost.viewModel.AuthStatus
+import com.dewipuspitasari0020.linakost.viewModel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
-    val viewModel: RegisterViewModel = viewModel(factory = factory)
+    val viewModel: UserViewModel = viewModel(factory = factory)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+
+    val loginStatus by viewModel.loginStatus.collectAsState()
 
     Scaffold(
         containerColor = bg
@@ -154,16 +159,7 @@ fun LoginScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = {
-                        if (email.isBlank() || password.isBlank()) {
-                            Toast.makeText(context, "Semua field harus diisi!", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        }
-                        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                            Toast.makeText(context, "Format email tidak valid!", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        }
-                    },
+                    onClick = { viewModel.login(email, password) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -179,6 +175,29 @@ fun LoginScreen(navController: NavHostController) {
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
+                }
+
+                when (loginStatus) {
+                    is AuthStatus.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                        Text("Logging in...")
+                    }
+                    is AuthStatus.LoginSuccess -> {
+                        Toast.makeText(context, "Login Successful! Welcome!", Toast.LENGTH_SHORT).show()
+                        LaunchedEffect(Unit) {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo("loginscreen") { inclusive = true }
+                            }
+                            viewModel.resetLoginStatus()
+                        }
+                    }
+                    is AuthStatus.Error -> {
+                        Toast.makeText(context, "Login Failed: ${(loginStatus as AuthStatus.Error).message}", Toast.LENGTH_LONG).show()
+                        LaunchedEffect(Unit) { viewModel.resetLoginStatus() }
+                    }
+                    AuthStatus.Idle -> {
+                    }
+                    else -> {}
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
