@@ -159,7 +159,17 @@ fun LoginScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { viewModel.login(email, password) },
+                    onClick = {
+                        if (email.isBlank() || password.isBlank()) {
+                            Toast.makeText(context, "Email dan password harus diisi!", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            Toast.makeText(context, "Format email tidak valid!", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        viewModel.login(email, password)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

@@ -23,7 +23,7 @@ class LoginViewModel(private val dao: UserDao, private val userDataStore: UserDa
                 val user = dao.login(email, password)
 
                 if (user != null) {
-                    userDataStore.saveUserData(user.id.toString(), user.email)
+                    userDataStore.saveUserData(user.id, user.email)
                     _loginStatus.value = AuthStatus.LoginSuccess(user)
                     Log.d("UserViewModel", "Login successful for: ${user.email}")
                 } else {

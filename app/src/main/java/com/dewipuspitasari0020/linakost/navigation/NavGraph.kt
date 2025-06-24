@@ -8,12 +8,13 @@ import androidx.navigation.compose.composable
 import com.dewipuspitasari0020.linakost.screen.LoginScreen
 import com.dewipuspitasari0020.linakost.screen.MainScreen
 import com.dewipuspitasari0020.linakost.screen.RegisterScreen
+import com.dewipuspitasari0020.linakost.screen.TambahPenginapScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Register.route
+        startDestination = Screen.Login.route
     ) {
         composable(route = Screen.Register.route) {
             RegisterScreen(navController)
@@ -25,6 +26,10 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(route = Screen.Home.route) {
             MainScreen(navController)
+        }
+
+        composable(route= Screen.TambahPenginap.route){
+            TambahPenginapScreen(navController)
         }
     }
 }
