@@ -17,12 +17,12 @@ interface PenginapDao {
     @Query("SELECT * FROM penginaps WHERE userId = :userId ORDER BY checkIn DESC")
     fun getPenginapsByUserId(userId: Int): Flow<List<Penginap>>
 
-    @Query("SELECT * FROM penginaps WHERE id = :penginapId")
-    suspend fun getPenginapById(penginapId: Int): Penginap?
+    @Query("SELECT * FROM penginaps WHERE id = :id")
+    suspend fun getBarangById(id: Int): Penginap?
 
      @Update
      suspend fun updatePenginap(penginap: Penginap)
 
-     @Delete
-     suspend fun deletePenginap(penginap: Penginap)
+    @Query("DELETE FROM penginaps WHERE id = :id")
+    suspend fun deleteById(id: Int)
 }

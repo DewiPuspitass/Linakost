@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.dewipuspitasari0020.linakost.database.PenginapDao
 import com.dewipuspitasari0020.linakost.model.Penginap
 import com.dewipuspitasari0020.linakost.util.UserDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +20,9 @@ class PenginapViewModel(private val penginapDao: PenginapDao, private val userDa
     private val _userId = MutableStateFlow<Int?>(null)
     val userId: StateFlow<Int?> = _userId
 
+    private val _selectedPenginap = MutableStateFlow<Penginap?>(null)
+    val selectedPenginap: StateFlow<Penginap?> = _selectedPenginap.asStateFlow()
+
     init {
         viewModelScope.launch {
             try {
@@ -31,6 +35,16 @@ class PenginapViewModel(private val penginapDao: PenginapDao, private val userDa
             } catch (e: Exception) {
                 Log.e("PenginapViewModel", "Error in init block: ${e.message}")
             }
+        }
+    }
+
+    suspend fun getBarang(id: Int): Penginap? {
+        return penginapDao.getBarangById(id)
+    }
+
+    fun delete(id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            penginapDao.deleteById(id)
         }
     }
 
@@ -70,5 +84,48 @@ class PenginapViewModel(private val penginapDao: PenginapDao, private val userDa
                 e.printStackTrace()
             }
         }
+    }
+
+    fun updatePenginap(
+        id: Int,
+        fullName: String,
+        numberRoom: String,
+        address: String,
+        price: Double,
+        checkIn: String,
+        checkOut: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val currentUserId = _userId.value
+
+            if (currentUserId == null || currentUserId == 0) {
+                onError("User ID tidak ditemukan. Mohon login kembali.")
+                return@launch
+            }
+
+            try {
+                val updatedPenginap = Penginap(
+                    id = id,
+                    userId = currentUserId,
+                    fullName = fullName,
+                    numberRoom = numberRoom,
+                    address = address,
+                    price = price,
+                    checkIn = checkIn,
+                    checkOut = checkOut
+                )
+                penginapDao.insertPenginap(updatedPenginap)
+                onSuccess()
+            } catch (e: Exception) {
+                onError("Gagal memperbarui penginap: ${e.localizedMessage ?: "Unknown error"}")
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun resetSelectedPenginap() {
+        _selectedPenginap.value = null
     }
 }

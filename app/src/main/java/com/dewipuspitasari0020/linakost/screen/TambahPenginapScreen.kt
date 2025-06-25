@@ -54,14 +54,25 @@ import java.util.Calendar
 import java.util.Locale
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
+import com.dewipuspitasari0020.linakost.R
+
+const val KEY_ID_PENGINAP = "id"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TambahPenginapScreen(
     navController: NavHostController,
+    id: Int? = null
 ) {
+    var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val viewModel: PenginapViewModel = viewModel(factory = factory)
@@ -144,11 +155,26 @@ fun TambahPenginapScreen(
         }
     }
 
+    LaunchedEffect(id) {
+        if (id != null) {
+            val penginap = viewModel.getBarang(id)
+            penginap?.let {
+                fullName = it.fullName
+                numberRoom = it.numberRoom.toString()
+                address = it.address.toString()
+                price = it.price.toString()
+                checkIn = it.checkIn
+                checkOut = it.checkOut
+            }
+        }
+    }
+
     Scaffold(
         containerColor = bg,
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = bg,
                     titleContentColor = Color.White
@@ -162,6 +188,13 @@ fun TambahPenginapScreen(
                             contentDescription = "Back",
                             tint = Color.White
                         )
+                    }
+                },
+                actions = {
+                    if (id != null){
+                        DeleteAction {
+                            showDialog = true
+                        }
                     }
                 }
             )
@@ -182,15 +215,26 @@ fun TambahPenginapScreen(
                         .align(Alignment.BottomStart)
                         .padding(start = 24.dp, bottom = 24.dp)
                 ) {
+                    val title = if (id == null)
+                        stringResource(R.string.tambah_penginap)
+                    else
+                        stringResource(R.string.edit_penginap)
+
                     Text(
-                        text = "Tambah Penginap",
+                        text = title,
                         color = Color.White,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+
+                    val subtitle = if (id == null)
+                        stringResource(R.string.subtitle_tambah)
+                    else
+                        stringResource(R.string.subtitle_edit)
+
                     Text(
-                        text = "Masukkan data penginap baru",
+                        text = subtitle,
                         color = Color.LightGray,
                         fontSize = 16.sp
                     )
@@ -340,22 +384,41 @@ fun TambahPenginapScreen(
                             return@Button
                         }
 
-                        viewModel.addPenginap(
-                            userId = idUser,
-                            fullName = fullName,
-                            numberRoom = numberRoom,
-                            address = address,
-                            price = priceDouble,
-                            checkIn = checkIn,
-                            checkOut = checkOut,
-                            onSuccess = {
-                                Toast.makeText(context, "Data penginap berhasil disimpan!", Toast.LENGTH_SHORT).show()
-                                navController.popBackStack()
-                            },
-                            onError = { errorMessage ->
-                                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                            }
-                        )
+                        if (id == null) {
+                            viewModel.addPenginap(
+                                userId = idUser,
+                                fullName = fullName,
+                                numberRoom = numberRoom,
+                                address = address,
+                                price = priceDouble,
+                                checkIn = checkIn,
+                                checkOut = checkOut,
+                                onSuccess = {
+                                    Toast.makeText(context, "Data penginap berhasil disimpan!", Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack()
+                                },
+                                onError = { errorMessage ->
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        } else {
+                            viewModel.updatePenginap(
+                                id = id,
+                                fullName = fullName,
+                                numberRoom = numberRoom,
+                                address = address,
+                                price = priceDouble,
+                                checkIn = checkIn,
+                                checkOut = checkOut,
+                                onSuccess = {
+                                    Toast.makeText(context, "Data penginap berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack()
+                                },
+                                onError = { errorMessage ->
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -374,9 +437,46 @@ fun TambahPenginapScreen(
                     )
                 }
             }
+
+            if(id != null && showDialog){
+                DisplayAlertDialog(
+                    onDismissRequest = { showDialog = false }) {
+                    showDialog = false
+                    viewModel.delete(id)
+                    navController.popBackStack()
+                }
+            }
         }
     }
 }
+
+
+@Composable
+fun DeleteAction(delete: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    IconButton(onClick = { expanded = true }) {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = stringResource(R.string.other),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false}
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(text = stringResource(id = R.string.delete))
+                },
+                onClick = {
+                    expanded = false
+                    delete()
+                }
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

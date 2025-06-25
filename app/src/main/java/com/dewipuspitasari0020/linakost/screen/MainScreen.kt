@@ -1,6 +1,7 @@
 package com.dewipuspitasari0020.linakost.screen
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -90,14 +92,19 @@ fun MainScreen(navController: NavHostController) {
     ) { innerPadding ->
         ScreenContent(
             modifier = Modifier.padding(innerPadding),
-            penginapViewModel = penginapViewModel
+            penginapViewModel = penginapViewModel,
+            navController = navController
         )
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier, penginapViewModel: PenginapViewModel) {
+fun ScreenContent(modifier: Modifier = Modifier, penginapViewModel: PenginapViewModel, navController: NavHostController) {
     val penginapList by penginapViewModel.penginapList.collectAsStateWithLifecycle()
+
+    LaunchedEffect(penginapList) {
+        Log.d("MyPenginapListScreen", "Penginap list updated: ${penginapList.size} items")
+    }
 
     Column(
         modifier = modifier
@@ -119,7 +126,7 @@ fun ScreenContent(modifier: Modifier = Modifier, penginapViewModel: PenginapView
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 items(penginapList) { penginap ->
-                    PenginapCard(penginap = penginap)
+                    PenginapCard(penginap = penginap, navController = navController)
                 }
             }
         }
@@ -127,9 +134,9 @@ fun ScreenContent(modifier: Modifier = Modifier, penginapViewModel: PenginapView
 }
 
 @Composable
-fun PenginapCard(penginap: Penginap) {
+fun PenginapCard(penginap: Penginap, navController: NavHostController) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { navController.navigate(Screen.UbahPenginap.withId(penginap.id))},
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF2C2C2E),
             contentColor = Color.White
@@ -142,8 +149,6 @@ fun PenginapCard(penginap: Penginap) {
             Text(text = "Nama: ${penginap.fullName}", style = MaterialTheme.typography.titleMedium, color = Color.White)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "Kamar: ${penginap.numberRoom}", style = MaterialTheme.typography.bodyMedium, color = Color.LightGray)
-            Text(text = "Alamat: ${penginap.address}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
-            Text(text = "Harga: Rp${String.format("%,.0f", penginap.price)}", style = MaterialTheme.typography.bodyMedium, color = Color.White)
             Text(text = "Check-in: ${penginap.checkIn}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
             Text(text = "Check-out: ${penginap.checkOut}", style = MaterialTheme.typography.bodySmall, color = Color.LightGray)
         }
