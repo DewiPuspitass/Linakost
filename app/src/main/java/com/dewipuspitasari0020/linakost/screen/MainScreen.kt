@@ -63,17 +63,6 @@ fun MainScreen(navController: NavHostController) {
                     containerColor = bg,
                     titleContentColor = Color.White
                 ),
-                actions = {
-                    IconButton(onClick = {
-                        Log.d("MainScreen", "Tombol profil diklik!")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "Profile",
-                            tint = Color.White
-                        )
-                    }
-                }
             )
         },
         floatingActionButton = {

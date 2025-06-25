@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.dewipuspitasari0020.linakost.SplashScreen1
 import com.dewipuspitasari0020.linakost.screen.KEY_ID_PENGINAP
 import com.dewipuspitasari0020.linakost.screen.LoginScreen
 import com.dewipuspitasari0020.linakost.screen.MainScreen
@@ -17,8 +18,12 @@ import com.dewipuspitasari0020.linakost.screen.TambahPenginapScreen
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route
+        startDestination = Screen.SplashScreen.route
     ) {
+        composable(route = Screen.SplashScreen.route) {
+            SplashScreen1(navController = navController)
+        }
+
         composable(route = Screen.Register.route) {
             RegisterScreen(navController)
         }

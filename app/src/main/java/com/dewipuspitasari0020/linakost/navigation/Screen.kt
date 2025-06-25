@@ -10,4 +10,6 @@ sealed class Screen(val route: String) {
     data object UbahPenginap: Screen("penginapscreen/{$KEY_ID_PENGINAP}") {
         fun withId(id: Int) = "penginapscreen/$id"
     }
+    data object SplashScreen: Screen("splashScreen")
+
 }
